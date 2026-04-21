@@ -1,0 +1,21 @@
+{
+  "name": "flexipdf-editor-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension for viewing, editing, and reviewing PDF content.",
+  "type": "module",
+  "scripts": {
+    "check": "npm test",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@ninja-labs/verify-pdf": "^1.0.0",
+    "fabric": "^7.2.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.6.205"
+  }
+}

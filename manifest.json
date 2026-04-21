@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "CompliancePDF Editor",
+  "description": "Open and edit PDF files with advanced text reflow and object editing.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "scripting",
+    "sidePanel",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "CompliancePDF Editor",
+    "default_popup": "src/popup/popup.html"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/content/content-script.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/viewer/*",
+        "src/core/*",
+        "src/core/reflow/*",
+        "src/core/objects/*",
+        "src/core/textflow/*",
+        "src/core/export/*",
+        "src/shared/*",
+        "src/compliance/*",
+        "src/compliance/detection/*",
+        "src/compliance/semantics/*",
+        "src/compliance/scoring/*",
+        "src/compliance/audit/*",
+        "src/compliance/integration/*",
+        "src/compliance/crypto/*",
+        "src/worker/*",
+        "node_modules/pdfjs-dist/build/*",
+        "node_modules/node-forge/dist/*",
+        "node_modules/@ninja-labs/verify-pdf/lib/helpers/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

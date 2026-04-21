@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CompliancePDF Viewer</title>
+    <link rel="stylesheet" href="./viewer.css" />
+  </head>
+  <body>
+    <header class="viewer-header">
+      <div class="main-dock">
+        <div class="header-primary-row">
+          <div class="segmented-control">
+            <button id="viewMode" class="segment active" data-mode="view">View</button>
+            <button id="textMode" class="segment" data-mode="text">Text Edit</button>
+            <button id="objectMode" class="segment" data-mode="object">Object Edit</button>
+          </div>
+          <div class="tool-card header-file-tools toolbar-tools">
+            <span class="group-title">File & View</span>
+            <label class="control-label" for="fileInput">PDF File</label>
+            <input id="fileInput" type="file" accept="application/pdf" />
+            <label class="control-label" for="exportPreset">Export</label>
+            <select id="exportPreset">
+              <option value="editable" selected>Editable</option>
+              <option value="balanced">Balanced</option>
+              <option value="flattened">Flattened</option>
+            </select>
+            <label class="control-label" for="uiDensityPreset">Density</label>
+            <select id="uiDensityPreset">
+              <option value="comfortable" selected>Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
+            <button id="toggleMetaPanelBtn" type="button" title="Toggle metadata panel">Panel</button>
+            <button id="themeToggleBtn" type="button" title="Toggle light/dark theme">Theme: Dark</button>
+            <button id="saveBtn" type="button" class="primary-btn">Save PDF</button>
+          </div>
+        </div>
+        <button class="btn-advanced" type="button" aria-expanded="false" aria-controls="advancedToolsPanel">Advance tools ▾</button>
+      </div>
+      <div id="advancedToolsPanel" class="toolbar-row toolbar-tools advanced-tools-panel">
+        <div class="tool-card advanced-control-group">
+          <span class="group-title">Assistant</span>
+          <label style="font-size:12px;">
+            <input id="snapGridToggle" type="checkbox" />
+            Snap
+          </label>
+          <span class="inline-help" title="Snap = hut vao luoi khi keo object. 5mm chinh xac hon, 10mm nhanh hon.">?</span>
+          <select id="snapGridSize">
+            <option value="5">5mm</option>
+            <option value="10" selected>10mm</option>
+            <option value="20">20mm</option>
+          </select>
+          <label style="font-size:12px;">
+            <input id="debugTextToggle" type="checkbox" />
+            Text debug
+          </label>
+        </div>
+        <div class="object-legend tool-card">
+          <span title="Toa do X (px)">X</span><span title="Toa do Y (px)">Y</span><span title="Width (px)">W</span><span title="Height (px)">H</span><span title="Do trong suot (0-1)">Opacity</span><span title="Goc xoay (do)">Rotate</span>
+          <span title="Scale theo truc X">Sx</span><span title="Scale theo truc Y">Sy</span><span title="Mau nen">Fill</span><span title="Mau vien">Stroke</span><span title="Do day vien">StrokeW</span>
+          <span title="Chieu rong theo % A4">W%A4</span><span title="Chieu cao theo % A4">H%A4</span>
+        </div>
+      </div>
+    </header>
+    <div class="viewer-layout">
+      <main id="viewerRoot" class="viewer-root" aria-label="PDF Viewer Canvas"></main>
+      <aside class="metadata-panel" aria-label="Metadata and Compliance Panel">
+        <h2>File Metadata</h2>
+        <div class="metadata-grid">
+          <span>Name</span><strong id="metaName">-</strong>
+          <span>Source</span><strong id="metaSource">-</strong>
+          <span>Pages</span><strong id="metaPages">-</strong>
+          <span>Page Size</span><strong id="metaPageSize">-</strong>
+          <span>Font</span><strong id="metaFont">-</strong>
+          <span>Scan Quality</span><strong id="metaScanQuality">-</strong>
+          <span>Digital Check</span><strong id="metaSignatureMode">-</strong>
+          <span>Title</span><strong id="metaTitle">-</strong>
+          <span>Author</span><strong id="metaAuthor">-</strong>
+          <span>Subject</span><strong id="metaSubject">-</strong>
+          <span>Creator</span><strong id="metaCreator">-</strong>
+          <span>Producer</span><strong id="metaProducer">-</strong>
+          <span>Keywords</span><strong id="metaKeywords">-</strong>
+        </div>
+        <section class="sidebar-object-panel">
+          <h2 style="margin-top:14px;">Object Inspector</h2>
+          <div class="object-group tool-card sidebar-object-group">
+            <div class="object-section object-section-info">
+              <span class="section-title">Info</span>
+              <span id="topObjectType" class="info-pill">Type: none</span>
+              <span id="topObjectHint" class="info-pill">No object selected</span>
+              <span id="topObjectA4Pct" class="info-pill">A4: --</span>
+            </div>
+            <details class="object-collapse-card">
+              <summary>Geometry</summary>
+              <div class="object-section object-section-geometry">
+                <label class="field-with-unit"><span>X</span><input id="topX" type="number" step="1" value="0" title="X position" /><em>px</em></label>
+                <label class="field-with-unit"><span>Y</span><input id="topY" type="number" step="1" value="0" title="Y position" /><em>px</em></label>
+                <label class="field-with-unit"><span>W</span><input id="topWidth" type="number" min="1" step="1" value="100" title="Object width" /><em>px</em></label>
+                <label class="field-with-unit"><span>H</span><input id="topHeight" type="number" min="1" step="1" value="100" title="Object height" /><em>px</em></label>
+                <label class="field-with-unit"><span>Rotate</span><input id="topRotate" type="number" min="-360" max="360" step="1" value="0" title="Rotation" /><em>deg</em></label>
+                <label class="field-with-unit"><span>Sx</span><input id="topScaleX" type="number" min="0.1" max="10" step="0.1" value="1" title="Scale X" /><em>x</em></label>
+                <label class="field-with-unit"><span>Sy</span><input id="topScaleY" type="number" min="0.1" max="10" step="0.1" value="1" title="Scale Y" /><em>x</em></label>
+                <label class="field-with-unit"><span>W%A4</span><input id="topA4WPercent" type="number" min="0.1" max="300" step="0.1" value="10" title="Width % of A4" /><em>%</em></label>
+                <label class="field-with-unit"><span>H%A4</span><input id="topA4HPercent" type="number" min="0.1" max="300" step="0.1" value="10" title="Height % of A4" /><em>%</em></label>
+              </div>
+            </details>
+            <details class="object-collapse-card">
+              <summary>Style</summary>
+              <div class="object-section object-section-style">
+                <label class="field-with-unit"><span>Opacity</span><input id="topOpacity" type="number" min="0" max="1" step="0.1" value="1" title="Opacity" /><em>0-1</em></label>
+                <label class="field-with-unit"><span>Fill</span><input id="topFill" type="text" value="#3b82f6" title="Fill color" /><em>hex</em></label>
+                <label class="field-with-unit"><span>Stroke</span><input id="topStroke" type="text" value="#2563eb" title="Stroke color" /><em>hex</em></label>
+                <label class="field-with-unit"><span>StrokeW</span><input id="topStrokeWidth" type="number" min="0" max="20" step="0.5" value="1.5" title="Stroke width" /><em>px</em></label>
+              </div>
+            </details>
+          </div>
+        </section>
+        <h2 style="margin-top:14px;">Compliance Scan</h2>
+        <div class="compliance-status-card" id="complianceStatusCard">
+          <div class="status-item">
+            <span>Decision</span><strong id="complianceDecision">-</strong>
+          </div>
+          <div class="status-item">
+            <span>Risk Score</span><strong id="complianceScore">-</strong>
+          </div>
+          <div class="status-item">
+            <span>Digital Sig</span><strong id="complianceDigitalSignature" class="digital-signature-badge">Unknown</strong>
+          </div>
+          <div class="status-item">
+            <span>Findings</span><strong id="complianceFindingsCount">0</strong>
+          </div>
+        </div>
+        <div class="metadata-grid compliance-config-grid">
+          <span>Policy</span>
+          <select id="compliancePolicy">
+            <option value="strict">Strict</option>
+            <option value="standard" selected>Standard</option>
+            <option value="review_only">Review-only</option>
+          </select>
+          <span>Template</span>
+          <select id="signatureZoneTemplate">
+            <option value="generic" selected>Generic Form</option>
+            <option value="loan_contract">Loan Contract</option>
+            <option value="payment_order">Payment Order</option>
+            <option value="kyc_form">KYC Form</option>
+          </select>
+        </div>
+        <div class="compliance-actions">
+          <button id="runComplianceBtn" type="button" aria-label="Run compliance scan">Run Scan</button>
+          <button id="exportEvidenceBtn" type="button" aria-label="Export evidence bundle">Export Evidence</button>
+        </div>
+        <div id="complianceScanState" class="compliance-scan-state" role="status" aria-live="polite">
+          Run scan to generate compliance evidence.
+        </div>
+        <div class="compliance-actions">
+          <button id="prevFindingBtn" type="button" aria-label="Focus previous finding">Prev finding</button>
+          <button id="nextFindingBtn" type="button" aria-label="Focus next finding">Next finding</button>
+        </div>
+        <label class="zone-visual-toggle">
+          <input id="showSignatureZoneToggle" type="checkbox" />
+          Show expected signature zone
+        </label>
+        <label class="zone-visual-toggle">
+          <input id="showEvidenceHeatmapToggle" type="checkbox" checked />
+          Show evidence heatmap
+        </label>
+        <div class="zone-config-grid">
+          <span>Zone List</span>
+          <select id="signatureZoneList"></select>
+          <span>Zone Type</span>
+          <select id="signatureZoneKind">
+            <option value="main">Main signature</option>
+            <option value="initial">Initial/nhay</option>
+          </select>
+        </div>
+        <div class="zone-config-grid">
+          <span>Zone X min %</span><input id="zoneXMin" type="number" min="0" max="100" step="0.1" value="52" />
+          <span>Zone X max %</span><input id="zoneXMax" type="number" min="0" max="100" step="0.1" value="98" />
+          <span>Zone Y min %</span><input id="zoneYMin" type="number" min="0" max="100" step="0.1" value="68" />
+          <span>Zone Y max %</span><input id="zoneYMax" type="number" min="0" max="100" step="0.1" value="98" />
+        </div>
+        <div class="compliance-actions">
+          <button id="addSignatureZoneBtn" type="button">Add expected signature zone</button>
+          <button id="removeSignatureZoneBtn" type="button">Remove selected zone</button>
+        </div>
+        <div class="compliance-actions">
+          <button id="saveZoneTemplateBtn" type="button">Save Zone</button>
+          <button id="resetZoneTemplateBtn" type="button">Reset Zone</button>
+        </div>
+        <div class="compliance-actions">
+          <button id="undoComplianceBtn" type="button">Undo Compliance</button>
+          <button id="redoComplianceBtn" type="button">Redo Compliance</button>
+        </div>
+        <div id="complianceBreakdown" class="compliance-breakdown"></div>
+        <div id="complianceExplainability" class="compliance-explainability"></div>
+        <div id="complianceFindingsList" class="compliance-findings-list" role="list" aria-label="Compliance findings"></div>
+        <pre id="complianceWhy" class="compliance-why">No scan results yet.</pre>
+      </aside>
+    </div>
+    <div class="shortcut-hint">
+      <span data-shortcut-scope="view">V: View</span>
+      <span data-shortcut-scope="text">T: Text</span>
+      <span data-shortcut-scope="object">O: Object</span>
+      <span data-shortcut-scope="view">R: Run Scan</span>
+      <span data-shortcut-scope="view">E: Export Evidence</span>
+      <span data-shortcut-scope="view">[ / ]: Prev/Next Finding</span>
+      <span data-shortcut-scope="view">Ctrl/Cmd+Shift+Z: Undo Compliance</span>
+      <span data-shortcut-scope="view">Ctrl/Cmd+Shift+Y: Redo Compliance</span>
+      <span data-shortcut-scope="object">Del: Remove</span>
+      <span data-shortcut-scope="object">Ctrl/Cmd + D: Duplicate</span>
+    </div>
+    <div id="loadingOverlay" class="loading-overlay" role="status" aria-live="assertive">Parsing PDF...</div>
+    <div id="statusToast" class="status-toast" role="status" aria-live="polite"></div>
+    <div id="objectHoverTooltip" class="object-hover-tooltip"></div>
+    <script type="module" src="./viewer-app.js"></script>
+  </body>
+</html>
